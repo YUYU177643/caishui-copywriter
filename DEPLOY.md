@@ -1,12 +1,14 @@
 # 财税文案神器 - GitHub Pages 免费部署教程
 
-本教程教你如何把 `caishui-copywriter-web.html` 免费部署到 GitHub Pages，生成一个 `https://你的用户名.github.io/仓库名` 的公网链接，手机和电脑都能打开，也能直接分享给团队。
+本教程教你如何把 `index.html` 免费部署到 GitHub Pages，生成一个 `https://你的用户名.github.io/仓库名` 的公网链接，手机和电脑都能打开，也能直接分享给团队。
+
+> 新版功能：8 种文案风格、智能组合引擎、一键复制全部、语音输入降级提示、需求自适应。
 
 ## 前置准备
 
 1. 一个 GitHub 账号（免费注册：https://github.com/signup）
-2. 已经下载好的 `caishui-copywriter-web.html` 文件
-3. 一个大模型 API 密钥（后面会讲怎么免费领）
+2. 已经下载好的 `index.html`、`README.md`、`DEPLOY.md` 三个文件
+3. 一个大模型 API 密钥（可选，后面会讲怎么免费领）
 
 ---
 
