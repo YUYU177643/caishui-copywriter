@@ -1,0 +1,1895 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>财税文案神器 - 景洪本地推硬广生成</title>
+  <style>
+    :root {
+      --primary: #2B7AE8;
+      --primary-light: #E8F2FF;
+      --success: #52C41A;
+      --danger: #FF4D4F;
+      --bg: #F5F7FA;
+      --card: #FFFFFF;
+      --text: #1F2937;
+      --text-secondary: #6B7280;
+      --border: #E5E7EB;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 16px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+      padding-top: 8px;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      color: var(--primary);
+      margin-bottom: 6px;
+    }
+
+    .header p {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .service-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .tag {
+      padding: 8px 14px;
+      background: var(--bg);
+      border-radius: 20px;
+      font-size: 14px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .tag.active {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    .demand-box {
+      width: 100%;
+      min-height: 100px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 15px;
+      resize: vertical;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .demand-box:focus {
+      border-color: var(--primary);
+    }
+
+    .voice-box {
+      margin-top: 12px;
+    }
+
+    .voice-btn {
+      width: 100%;
+      padding: 16px;
+      background: var(--primary-light);
+      color: var(--primary);
+      border: 1px solid var(--primary);
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .voice-btn:active, .voice-btn.recording {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .voice-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .voice-status {
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 8px;
+      min-height: 20px;
+    }
+
+    .voice-tip {
+      display: block;
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--primary);
+      min-height: 20px;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 16px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary:active {
+      opacity: 0.9;
+    }
+
+    .btn-primary:disabled {
+      background: #A0C4FF;
+      cursor: not-allowed;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: #999;
+      margin-top: 12px;
+      text-align: center;
+    }
+
+    .result {
+      display: none;
+    }
+
+    .result.open {
+      display: block;
+    }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .result-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .result-tag {
+      font-size: 12px;
+      color: var(--primary);
+      background: var(--primary-light);
+      padding: 4px 10px;
+      border-radius: 12px;
+    }
+
+    .block {
+      margin-bottom: 24px;
+    }
+
+    .block-label {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .copy-item {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      background: var(--bg);
+      padding: 14px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+
+    .copy-text {
+      flex: 1;
+      font-size: 14px;
+      line-height: 1.7;
+      word-break: break-word;
+    }
+
+    .copy-btn {
+      font-size: 13px;
+      color: var(--primary);
+      white-space: nowrap;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: #fff;
+      border: 1px solid var(--primary);
+    }
+
+    .script-block {
+      background: var(--bg);
+      padding: 16px;
+      border-radius: 10px;
+      font-size: 14px;
+      line-height: 1.8;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .toast {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.75);
+      color: #fff;
+      padding: 14px 24px;
+      border-radius: 10px;
+      font-size: 14px;
+      z-index: 1000;
+      display: none;
+      text-align: center;
+      max-width: 80%;
+    }
+
+    .toast.show {
+      display: block;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid #fff;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .recording-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      flex-direction: column;
+      color: #fff;
+    }
+
+    .recording-overlay.show {
+      display: flex;
+    }
+
+    .recording-circle {
+      width: 80px;
+      height: 80px;
+      background: var(--danger);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 16px;
+      animation: pulse 1.2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+    }
+
+    .recording-time {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .recording-tip {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .settings-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      color: var(--text-secondary);
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .settings-panel {
+      display: none;
+      padding-top: 8px;
+    }
+
+    .settings-panel.open {
+      display: block;
+    }
+
+    .settings-group {
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px dashed var(--border);
+    }
+
+    .settings-group-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+      border-color: var(--primary);
+    }
+
+    .btn-secondary {
+      width: 100%;
+      padding: 12px;
+      background: #fff;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+      border-radius: 10px;
+      font-size: 14px;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    .api-status {
+      font-size: 13px;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      display: none;
+    }
+
+    .api-status.success {
+      display: block;
+      background: #F6FFED;
+      color: var(--success);
+      border: 1px solid #B7EB8F;
+    }
+
+    .api-status.error {
+      display: block;
+      background: #FFF2F0;
+      color: var(--danger);
+      border: 1px solid #FFCCC7;
+    }
+  </style>
+</head>
+<body>
+  <div id="toast" class="toast"></div>
+  <div id="recordingOverlay" class="recording-overlay">
+    <div class="recording-circle">🎤</div>
+    <div id="recordingTime" class="recording-time">00:00</div>
+    <div class="recording-tip">松开结束录音</div>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <h1>财税文案神器</h1>
+      <p>景洪本地推硬广文案，一秒生成</p>
+    </div>
+
+    <div class="card">
+      <div class="section-title">📋 选择业务</div>
+      <div class="service-tags" id="serviceTags">
+        <span class="tag active" data-value="dailizhang">代理记账</span>
+        <span class="tag" data-value="zhucegongsi">注册公司</span>
+        <span class="tag" data-value="gongshangbiangeng">工商变更</span>
+        <span class="tag" data-value="shuiwuchouhua">税务筹划</span>
+        <span class="tag" data-value="zizhudaili">资质代办</span>
+        <span class="tag" data-value="caishuizixun">财税咨询</span>
+        <span class="tag" data-value="gongsizhuxiao">公司注销</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">📝 补充需求（可选）</div>
+      <textarea id="demandInput" class="demand-box" placeholder="比如：突出价格便宜、强调本地服务、针对个体户..."></textarea>
+      <div class="voice-box">
+        <button id="voiceBtn" class="voice-btn">
+          <span>🎤</span>
+          <span id="voiceBtnText">按住说话</span>
+        </button>
+        <div id="voiceStatus" class="voice-status"></div>
+        <span id="voiceTip" class="voice-tip"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <button class="btn-primary" id="generateBtn">立即生成文案（本地模板，1秒出稿）</button>
+      <button class="btn-primary" id="aiBtn" style="margin-top:12px;background:#52c41a;">AI 智能生成（需 API 密钥，6秒保底）</button>
+
+      <div class="hint">默认使用本地极速模板，无需 API 密钥也能生成。想要 AI 创意版可点绿色按钮。</div>
+
+      <div class="settings-toggle" id="settingsToggle">
+        <span>API 设置 / 飞书同步 / 演示模式</span>
+        <span id="settingsArrow">▼</span>
+      </div>
+      <div class="settings-panel" id="settingsPanel">
+        <div class="settings-group">
+          <div class="settings-group-title">大模型 API（可选）</div>
+          <div class="form-group">
+            <label>API 密钥</label>
+            <input type="text" id="apiKey" placeholder="例如：ARK-xxxxxxxx">
+          </div>
+          <div class="form-group">
+            <label>接口地址</label>
+            <input type="text" id="baseURL" placeholder="https://ark.cn-beijing.volces.com/api/v3">
+          </div>
+          <div class="form-group">
+            <label>模型名称</label>
+            <input type="text" id="modelName" placeholder="例如：doubao-seed-2-1-pro-260628">
+          </div>
+          <button class="btn-secondary" id="testApiBtn">测试 API 连接</button>
+          <div id="apiStatus" class="api-status"></div>
+        </div>
+
+        <div class="settings-group">
+          <div class="settings-group-title">飞书文档同步（可选）</div>
+          <div class="form-group">
+            <label>飞书 App ID</label>
+            <input type="text" id="feishuAppId" placeholder="cli_xxxxxxxx">
+          </div>
+          <div class="form-group">
+            <label>飞书 App Secret</label>
+            <input type="text" id="feishuAppSecret" placeholder="xxxxxxxx">
+          </div>
+        </div>
+
+        <button class="btn-secondary" id="saveSettingsBtn">保存设置</button>
+        <button class="btn-secondary" id="syncFeishuBtn" style="margin-top:8px;">同步到飞书文档</button>
+      </div>
+    </div>
+
+    <div class="card result" id="resultCard">
+      <div class="result-header">
+        <div class="result-title">生成结果</div>
+        <div class="result-tag" id="resultTag">本地极速模板</div>
+      </div>
+
+      <div class="block">
+        <span class="block-label">🎯 标题备选</span>
+        <div id="titlesList"></div>
+      </div>
+
+      <div class="block">
+        <span class="block-label">🎬 口播脚本</span>
+        <div class="script-block" id="scriptText"></div>
+      </div>
+
+      <div class="block">
+        <span class="block-label">🖼️ 封面文案</span>
+        <div class="script-block" id="coverText"></div>
+      </div>
+
+      <div class="block">
+        <span class="block-label">💬 评论区引导</span>
+        <div id="commentsList"></div>
+      </div>
+
+      <div class="block">
+        <span class="block-label">🚀 行动号召</span>
+        <div class="script-block" id="ctaText"></div>
+      </div>
+
+      <div id="resultNotice" class="voice-tip"></div>
+    </div>
+  </div>
+
+  <script>
+    // ========== 状态 ==========
+    const state = {
+      service: 'dailizhang',
+      demand: '',
+      generating: false,
+      settingsOpen: false,
+      lastResult: null,
+    };
+
+    // ========== 本地文案模板库（7 个业务 × 3 套模板） ==========
+    const COPY_TEMPLATES = {
+      dailizhang: [
+        {
+          titles: [
+            "在景洪，一个月200不到的代账，到底靠不靠谱？",
+            "景洪老板注意了，这笔冤枉钱别再花了！",
+            "在景洪开公司，记账报税这件事千万别自己硬撑"
+          ],
+          script: `【画面】老板对着电脑发愁，手机弹出税务短信
+【台词】在景洪开公司的老板，你是不是也这样？每个月记账报税自己搞，看不懂又怕被罚，请个会计吧，四五千一个月又舍不得。
+
+【画面】切换到办公室，工作人员在整理账本
+【台词】其实啊，找我们代理记账，一个月也就一顿饭钱，小规模、一般纳税人都能接，记账、报税、开票、异常处理，全部帮你捋清楚。
+
+【画面】老板轻松接电话、看店
+【台词】你安心做生意，财税的事交给我们。景洪本地团队，随叫随到。
+
+【画面】结尾大字+联系方式
+【台词】现在评论“代账”，前20名老板免费做一期财税健康诊断，名额有限，先到先得。`,
+          cover: "大字：在景洪，代账一个月也就一顿饭钱\n小字：记账+报税+开票+异常处理，全包",
+          comments: [
+            { question: "一个月具体多少？", answer: "看业务量嘛，私信你发报价单，对比一下不吃亏。" },
+            { question: "个体户也要记账吗？", answer: "当然要呢，很多老板就是被这点搞漏了，私信我帮你看看。" }
+          ],
+          cta: "评论区扣‘代账’，前20名免费财税诊断，名额有限噶！"
+        },
+        {
+          titles: [
+            "90%的景洪个体户都不知道，这笔罚款完全可以避免",
+            "在景洪做生意，为什么总收到税务异常短信？",
+            "景洪老板，你的记账方式可能一直在吃亏"
+          ],
+          script: `【画面】手机收到税务异常短信，老板脸色变了
+【台词】在景洪做生意的老板，最怕收到这种短信：税务异常、逾期未申报、罚款通知。
+
+【画面】账本、发票摊了一桌子
+【台词】很多老板觉得个体户不用记账，结果一年到头账一团乱，补税加罚款比一年代账费还贵。
+
+【画面】专业会计团队快速整理账本
+【台词】找我们代理记账，一个月少抽几包烟的钱，记账、报税、年报、异常处理全包，让你睡得踏实。
+
+【画面】老板笑着看手机，税务短信变成“申报成功”
+【台词】景洪本地团队，一对一服务。现在私信“代账”，免费帮你查一次公司税务状态。`,
+          cover: "大字：别让罚款吃掉你的利润\n小字：景洪代理记账 · 记账+报税+异常处理",
+          comments: [
+            { question: "小规模纳税人多少钱？", answer: "小规模便宜呢，具体看开票量，私信发你报价。" },
+            { question: "可以上门取资料吗？", answer: "景洪本地可以的，约时间我们上门拿。" }
+          ],
+          cta: "私信‘代账’，免费查税务状态"
+        },
+        {
+          titles: [
+            "在景洪，请个会计太贵，不请会计又心慌？",
+            "代账公司怎么选？景洪老板记住这三点",
+            "一个月几百块，解决你一年的财税焦虑"
+          ],
+          script: `【画面】老板面试会计，听到工资后摇头
+【台词】在景洪请个全职会计，四五千起步，还不包括社保。公司业务不多的时候，这笔钱花得真心疼。
+
+【画面】对比代账公司服务清单
+【台词】其实啊，找一家靠谱的代账公司，一个月几百块，记账、报税、开票、年检、异常处理，全部搞定。
+
+【画面】会计团队在工作，老板在谈生意
+【台词】我们团队服务景洪本地小微企业多年，响应快、经验丰富，出了问题随时找得到人。
+
+【画面】结尾
+【台词】现在评论“代账”，前10名老板首月体验价，名额有限噶！`,
+          cover: "大字：请会计太贵？代账更划算\n小字：景洪本地 · 一对一 · 响应快",
+          comments: [
+            { question: "代账公司靠谱吗？", answer: "看资质和服务呢，我们有多年经验，可以先咨询再决定。" },
+            { question: "一般纳税人能做吗？", answer: "能做的，一般纳税人和小规模都可以。" }
+          ],
+          cta: "评论‘代账’，抢首月体验价"
+        }
+      ],
+      zhucegongsi: [
+        {
+          titles: [
+            "在景洪注册公司，自己跑3趟，我们3天拿证",
+            "景洪老板注册公司，别再被材料打回折腾了",
+            "0元注册公司？景洪这边真的有"
+          ],
+          script: `【画面】老板在政务大厅排队，手里拿着一沓材料
+【台词】在景洪注册公司，自己跑工商、跑税务、跑银行，材料不对还要被打回，一趟又一趟，时间都耗在路上了。
+
+【画面】工作人员在电脑前快速录入信息
+【台词】找我们注册公司，你只需要提供身份证和地址，核名、提交材料、领执照、刻章、开户，全部帮你整清楚。
+
+【画面】老板拿到营业执照，露出笑容
+【台词】快的话3天就能拿证，你只管想公司名字，剩下的交给我们。
+
+【画面】结尾大字
+【台词】现在私信“注册”，免费领取注册公司资料包，前20名还送公章一套。`,
+          cover: "大字：景洪注册公司，3天拿证\n小字：核名+执照+刻章+开户，一站式代办",
+          comments: [
+            { question: "注册公司要多少钱？", answer: "执照代办可以0元呢，刻章和地址费另算，私信给你明细。" },
+            { question: "没有地址能注册吗？", answer: "可以呢，我们帮你找挂靠地址，合法合规。" }
+          ],
+          cta: "私信‘注册’，免费领资料包"
+        },
+        {
+          titles: [
+            "景洪个体户升级公司，流程其实很简单",
+            "在景洪，一个人也能注册公司",
+            "注册公司需要准备什么？一张图说清楚"
+          ],
+          script: `【画面】老板看着“个体户”营业执照，想升级
+【台词】生意做大了，个体户已经不够用了，想注册公司又不知道从哪里开始。
+
+【画面】流程图展示：核名→提交材料→领执照→刻章→开户→税务登记
+【台词】注册公司其实就这几步：核名、提交材料、领执照、刻章、开户、税务登记。材料准备对了，3-5天就能办完。
+
+【画面】专业顾问一对一讲解
+【台词】我们帮你全程代办，从公司类型选择到经营范围填写，避免你踩坑。
+
+【画面】结尾
+【台词】现在评论“公司”，免费获取景洪注册公司全流程清单。`,
+          cover: "大字：一个人也能注册公司\n小字：景洪本地 · 3天拿证 · 全程代办",
+          comments: [
+            { question: "注册公司要多久？", answer: "材料齐全3-5个工作日，快的话3天。" },
+            { question: "需要本人到场吗？", answer: "大部分环节不用呢，我们可以代办。" }
+          ],
+          cta: "评论‘公司’，免费领全流程清单"
+        },
+        {
+          titles: [
+            "在景洪开公司，核名总不过？这样起名字稳过",
+            "公司核名被驳回？多半是这几点没注意",
+            "景洪注册公司，从核名到拿证一条龙"
+          ],
+          script: `【画面】老板提交公司名称，系统显示“核名不通过”
+【台词】公司名字想好了，提交上去却说重名、近似、违规，白白浪费时间。
+
+【画面】顾问在电脑前帮老板查重名
+【台词】我们有丰富的核名经验，先帮你查重、筛选，再起3-5个备选名字，大大提高通过率。
+
+【画面】核名通过，顺利提交材料
+【台词】核名过了，后面就是提交材料、领执照、刻章、开户，我们全程帮你跑。
+
+【画面】结尾
+【台词】现在私信“核名”，免费帮你预审公司名称，3分钟出结果。`,
+          cover: "大字：公司核名总不过？免费帮你预审\n小字：景洪注册公司 · 提高核名通过率",
+          comments: [
+            { question: "核名要多久？", answer: "一般当天或次日就有结果。" },
+            { question: "名字被驳回怎么办？", answer: "我们免费帮你重新起名字再提交。" }
+          ],
+          cta: "私信‘核名’，免费预审公司名称"
+        }
+      ],
+      gongshangbiangeng: [
+        {
+          titles: [
+            "景洪公司变更法人，自己跑太麻烦？",
+            "法人、股权、地址变更，景洪本地一站式搞定",
+            "公司信息要变更，别因为材料不齐反复跑"
+          ],
+          script: `【画面】老板拿着一堆变更材料，在工商窗口前排队
+【台词】公司要变更法人、股权、地址或者经营范围，很多老板以为签个字就完事，结果材料不齐、表格填错，反复被打回。
+
+【画面】变更材料清单展示
+【台词】工商变更涉及的材料和流程其实不少：股东会决议、章程修正案、变更申请书、新法人身份证明……一步漏了就白跑。
+
+【画面】顾问一对一梳理变更流程
+【台词】我们帮你一次性把材料整对，从准备到提交到领新执照，全程不用你操心。
+
+【画面】老板拿到变更后的营业执照
+【台词】景洪本地团队，熟悉工商变更的各个环节。现在私信“变更”，免费评估你的变更需求。`,
+          cover: "大字：景洪工商变更，一次办妥\n小字：法人·股权·地址·经营范围，全代办",
+          comments: [
+            { question: "变更法人要多久？", answer: "材料齐全一般5-10个工作日。" },
+            { question: "股东变更需要到场吗？", answer: "一般不需要，具体看情况，私信详聊。" }
+          ],
+          cta: "私信‘变更’，免费评估变更需求"
+        },
+        {
+          titles: [
+            "在景洪，公司地址变更没你想的那么简单",
+            "搬迁了？公司地址不变更要罚款",
+            "景洪公司地址变更，全程代办不跑腿"
+          ],
+          script: `【画面】公司搬了新办公室，老板忘了变更地址
+【台词】公司搬了新地址，很多企业主忘了做工商变更，结果被列入经营异常名录，影响招投标、贷款，麻烦得很。
+
+【画面】新地址租赁合同、房产证明
+【台词】地址变更需要新地址的租赁合同或房产证明，还要更新税务登记、银行信息，一步不能少。
+
+【画面】工作人员提交地址变更申请
+【台词】我们帮你准备材料、提交申请、跟进审批，你安心搬办公室，变更的事交给我们。
+
+【画面】结尾
+【台词】现在评论“地址变更”，前10名免费咨询。`,
+          cover: "大字：公司搬迁，地址变更别忘了\n小字：景洪本地 · 工商+税务+银行，同步变更",
+          comments: [
+            { question: "地址变更要多久？", answer: "一般5-7个工作日。" },
+            { question: "没实际地址能变更吗？", answer: "可以呢，我们帮你找合规挂靠地址。" }
+          ],
+          cta: "评论‘地址变更’，前10名免费咨询"
+        },
+        {
+          titles: [
+            "景洪股权变更，这一步没做对后面麻烦大",
+            "在景洪，公司股权转让要交哪些税？",
+            "股权变更不是签个字就完事，景洪老板注意"
+          ],
+          script: `【画面】两个老板在谈股权转让
+【台词】公司股权要变更，很多老板以为签个转让协议就行了，其实还要变更税务登记、工商登记，涉及印花税、个人所得税，一步漏了后面补起来麻烦得很。
+
+【画面】财税顾问梳理股权变更流程
+【台词】我们帮你把股权变更全流程捋清楚，从协议拟定、税务申报到工商变更，一次性办到位。
+
+【画面】老板拿到变更后的营业执照
+【台词】景洪本地团队，熟悉股权变更的各个环节，让你少走弯路。
+
+【画面】结尾
+【台词】现在私信“股权变更”，免费评估你的变更需求和税费情况。`,
+          cover: "大字：股权变更，一步都不能漏\n小字：景洪本地 · 协议+税务+工商，全流程代办",
+          comments: [
+            { question: "股权变更要交税吗？", answer: "要呢，印花税、个人所得税等，具体看转让价格，私信帮你算。" },
+            { question: "变更要多久？", answer: "材料齐全一般5-10个工作日，具体看情况。" }
+          ],
+          cta: "私信‘股权变更’，免费评估税费"
+        }
+      ],
+      shuiwuchouhua: [
+        {
+          titles: [
+            "景洪老板，你的税是不是交多了？",
+            "同样做生意，为什么别人交的税比你少？",
+            "合法合规的前提下，企业税负还能降"
+          ],
+          script: `【画面】老板看着利润表，税负一栏很高
+【台词】做生意不容易，到年底一算账，发现税交了不少，利润却剩不下多少。
+
+【画面】财税顾问分析企业税负结构
+【台词】其实啊，在合法合规的前提下，企业的税负结构是可以优化的。不是让你偷税漏税，而是把该用的优惠政策、该调整的业务结构用起来。
+
+【画面】对比优化前后的税负
+【台词】我们根据你的行业、规模、业务模式，帮你做税务筹划方案，合理降低税负。
+
+【画面】结尾
+【台词】现在私信“税筹”，免费做一次企业税负诊断。`,
+          cover: "大字：你的企业，税负还能优化\n小字：景洪本地 · 合法合规 · 量身定制",
+          comments: [
+            { question: "税筹合法吗？", answer: "合法呢，关键是基于真实业务和合规政策，不搞虚开发票。" },
+            { question: "能省多少税？", answer: "要看企业情况，私信我帮你测算。" }
+          ],
+          cta: "私信‘税筹’，免费税负诊断"
+        },
+        {
+          titles: [
+            "在景洪，哪些税收优惠你还没用上？",
+            "小微企业、个体户，这些税惠别浪费",
+            "景洪财税顾问：先把该领的政策红利领完"
+          ],
+          script: `【画面】老板在报税，不知道有哪些优惠
+【台词】国家给小微企业、个体户很多税收优惠政策，但很多老板根本不知道自己能享受哪些。
+
+【画面】政策文件+企业情况对照
+【台词】增值税减免、所得税优惠、社保补贴……这些政策红利，符合条件的都能用。
+
+【画面】顾问帮老板梳理可享受的优惠
+【台词】我们帮你梳理企业能享受的优惠政策，该报的报、该减的减，不多交一分冤枉钱。
+
+【画面】结尾
+【台词】现在评论“税惠”，免费帮你排查可享受的税收优惠政策。`,
+          cover: "大字：该享受的税惠，别漏了\n小字：景洪本地 · 政策梳理 · 优惠申报",
+          comments: [
+            { question: "个体户有什么优惠？", answer: "小规模纳税人增值税减免、个税核定这些，具体私信帮你看看。" },
+            { question: "怎么知道我能享受哪些？", answer: "私信我，把你的行业和规模告诉我，我帮你排查。" }
+          ],
+          cta: "评论‘税惠’，免费排查优惠政策"
+        },
+        {
+          titles: [
+            "景洪老板，社保公积金也是税筹的一部分",
+            "用工成本高？看看你的社保公积金有没有优化空间",
+            "合规前提下，景洪企业用工成本还能这样降"
+          ],
+          script: `【画面】老板看着工资表和社保缴费单发愁
+【台词】员工工资、社保、公积金，每个月都是一笔不小的开支。很多景洪老板不知道，在合规范围内，用工结构和薪酬结构是可以优化的。
+
+【画面】财税顾问讲解用工优化方案
+【台词】我们根据你的企业规模和用工情况，帮你设计合理的薪酬和社保方案，既保障员工权益，也降低企业成本。
+
+【画面】老板轻松看报表
+【台词】不搞擦边球，只做合法合规的优化。
+
+【画面】结尾
+【台词】现在私信“用工优化”，免费做一次企业用工成本诊断。`,
+          cover: "大字：用工成本高？有合规优化空间\n小字：景洪企业 · 薪酬社保优化 · 合法合规",
+          comments: [
+            { question: "优化社保合法吗？", answer: "合法呢，关键是结构和基数要合规，私信详聊。" },
+            { question: "能降多少成本？", answer: "要看现有结构，私信我帮你测算。" }
+          ],
+          cta: "私信‘用工优化’，免费成本诊断"
+        }
+      ],
+      zizhudaili: [
+        {
+          titles: [
+            "在景洪开店，这些证你办齐了吗？",
+            "食品经营许可证、卫生许可证，景洪本地快速代办",
+            "资质代办，景洪老板别再自己跑腿了"
+          ],
+          script: `【画面】老板准备开业，发现还差好几个证
+【台词】在景洪开餐饮、美容、宾馆、诊所这些店，光有个营业执照还不够，食品经营、卫生许可、特种行业许可，一个都不能少。
+
+【画面】各种许可证展示
+【台词】自己办吧，不知道要准备什么材料，现场核查还总过不了，开业时间一拖再拖。
+
+【画面】顾问帮老板整理办证材料
+【台词】我们代办各类经营许可证，熟悉景洪各部门要求，从材料准备到现场核查，全程帮你跟进。
+
+【画面】老板顺利开业
+【台词】现在私信“资质”，免费领开店所需证照清单。`,
+          cover: "大字：景洪资质代办，快速拿证\n小字：食品·卫生·特种行业，一站式代办",
+          comments: [
+            { question: "食品经营许可证要多久？", answer: "材料齐全、现场通过的话，一般7-15天。" },
+            { question: "代办要多少钱？", answer: "看具体资质，私信给你报价。" }
+          ],
+          cta: "私信‘资质’，免费领开店证照清单"
+        },
+        {
+          titles: [
+            "景洪餐饮店办证，最容易卡在哪一步？",
+            "开餐馆不是只办营业执照，这个证才是关键",
+            "食品经营许可证代办，景洪本地最快3天"
+          ],
+          script: `【画面】餐馆装修好了，老板急着开业
+【台词】在景洪开餐馆，营业执照办好了，结果食品经营许可证还没下来，迟迟开不了业。
+
+【画面】厨房布局、设备清单、健康证
+【台词】食品经营许可对场地布局、设备、健康证都有要求，现场核查不过就要整改，一拖就是十几天。
+
+【画面】工作人员指导厨房整改
+【台词】我们代办食品经营许可证，先帮你预审场地布局，避免整改，材料一次过。
+
+【画面】老板拿到许可证开业
+【台词】景洪本地服务，熟悉食药监要求。现在私信“食品证”，免费预审你的开店场地。`,
+          cover: "大字：景洪食品证代办\n小字：场地预审+材料代办+现场跟进",
+          comments: [
+            { question: "办食品证要准备什么？", answer: "营业执照、身份证、场地证明、健康证、设备布局图等，私信发你清单。" },
+            { question: "现场核查严吗？", answer: "我们有经验，可以帮你提前把场地整规范。" }
+          ],
+          cta: "私信‘食品证’，免费预审场地"
+        },
+        {
+          titles: [
+            "景洪办卫生许可证，这些坑别踩",
+            "开美容院、理发店、宾馆，这个证不能少",
+            "卫生许可证代办，景洪本地最快3天拿证"
+          ],
+          script: `【画面】老板准备开业，被告知还差卫生许可证
+【台词】在景洪开美容院、理发店、宾馆、餐饮这些行业，卫生许可证是必备的，没证不敢开门营业。
+
+【画面】工作人员准备卫生许可证材料
+【台词】我们代办卫生许可证，从场地布局指导、材料准备到提交审批、现场核查跟进，全程帮你整清楚。
+
+【画面】老板顺利拿到卫生许可证开业
+【台词】景洪本地服务，熟悉卫健部门要求，让你少走弯路、早开业。
+
+【画面】结尾
+【台词】现在私信“卫生许可”，免费领材料清单和办理流程。`,
+          cover: "大字：景洪卫生许可证代办\n小字：美容·理发·宾馆·餐饮，3天拿证",
+          comments: [
+            { question: "卫生许可证要多久？", answer: "材料齐全、现场通过的话，一般3-7天。" },
+            { question: "现场核查严吗？", answer: "我们有经验，可以帮你提前把场地整规范，私信详聊。" }
+          ],
+          cta: "私信‘卫生许可’，免费领办理清单"
+        }
+      ],
+      caishuizixun: [
+        {
+          titles: [
+            "景洪老板，公司账目有问题不敢查？",
+            "财务外包，比请会计更划算",
+            "在景洪，一个月一顿饭钱就能请个财务团队"
+          ],
+          script: `【画面】老板看着乱糟糟的账本，叹气
+【台词】公司账目乱、报表看不懂、成本算不清，一到做决策就抓瞎。
+
+【画面】财务团队整理报表、分析数据
+【台词】找我们做财务外包，相当于请了一个专业财务团队：记账、报税、财务报表、成本分析、经营建议，全部帮你搞定。
+
+【画面】老板看着清晰的财务报表做决策
+【台词】你花的不是代账费，是请了一个懂财税的顾问，帮你把公司经营看得更清楚。
+
+【画面】结尾
+【台词】现在私信“外包”，免费定制适合你公司的财务外包方案。`,
+          cover: "大字：财务外包，比请会计更划算\n小字：景洪本地 · 记账+报表+分析+建议",
+          comments: [
+            { question: "外包和代账有什么区别？", answer: "代账主要是记账报税，外包还包括财务分析、经营建议这些。" },
+            { question: "适合什么企业？", answer: "业务多了、想看明白账的企业都适合。" }
+          ],
+          cta: "私信‘外包’，免费定制方案"
+        },
+        {
+          titles: [
+            "景洪创业者，财税问题别等到年底才想",
+            "从注册到报税，一站式财税咨询",
+            "在景洪，有财税问题随时问"
+          ],
+          script: `【画面】创业者深夜还在查财税政策
+【台词】创业初期，政策不懂、流程不熟、账目不清，很多问题堆到年底才发现，补起来又贵又麻烦。
+
+【画面】财税顾问一对一咨询
+【台词】我们提供一站式财税咨询服务，从公司注册、股权设计、记账报税到税务筹划，有问题随时问。
+
+【画面】创业者轻松处理公司事务
+【台词】与其自己摸索踩坑，不如花一顿饭钱请专业的人帮你把关。
+
+【画面】结尾
+【台词】现在评论“咨询”，前10名免费一对一财税咨询。`,
+          cover: "大字：财税问题，随时问\n小字：景洪本地 · 注册到报税 · 一站式咨询",
+          comments: [
+            { question: "咨询怎么收费？", answer: "首次咨询有免费名额，具体私信聊。" },
+            { question: "能上门吗？", answer: "景洪本地可以的，提前预约就行。" }
+          ],
+          cta: "评论‘咨询’，抢免费一对一咨询"
+        },
+        {
+          titles: [
+            "景洪老板，旧账乱账别再拖了",
+            "账本一团乱，报税心里没底？这样整清楚",
+            "旧账整理+规范建账，景洪小微企业也能做"
+          ],
+          script: `【画面】老板翻着几本旧账本，头大
+【台词】公司开了一两年，账本乱七八糟，发票丢了、流水对不上、成本票没留，一到报税就心慌。
+
+【画面】会计团队梳理旧账
+【台词】我们提供旧账整理服务，帮你把历史账目逐笔核对、补齐凭证、规范建账，让财务报表真实反映经营情况。
+
+【画面】老板看着整齐的报表松口气
+【台词】账理顺了，报税有底气，融资、贷款、注销都不怕查。
+
+【画面】结尾
+【台词】现在评论“旧账”，免费评估你的旧账整理难度和报价。`,
+          cover: "大字：旧账乱账，一次整清楚\n小字：景洪本地 · 旧账整理 · 规范建账",
+          comments: [
+            { question: "旧账整理要多久？", answer: "看账目混乱程度，几个月到一两年都能整，私信评估。" },
+            { question: "整理完能直接报税吗？", answer: "可以呢，整完账后面的申报就规范了。" }
+          ],
+          cta: "评论‘旧账’，免费评估整理报价"
+        }
+      ],
+      gongsizhuxiao: [
+        {
+          titles: [
+            "公司不经营了，千万别放着不管",
+            "在景洪，注销公司比你想的便宜",
+            "异常公司怎么注销？景洪本地代办"
+          ],
+          script: `【画面】老板看着不经营的公司营业执照，发愁
+【台词】公司不干了，营业执照放着不管，年报不报、税务不注销，最后被吊销、法人进黑名单，影响以后创业、贷款、出行。
+
+【画面】注销流程图：税务注销→工商注销→银行注销
+【台词】其实啊，公司不经营了，正规注销掉才是对自己负责。税务注销、工商注销、银行注销，一步都不能少。
+
+【画面】顾问帮老板查公司状态
+【台词】我们帮你查公司有没有异常、欠税、未申报，先把问题处理好，再正规注销。
+
+【画面】结尾
+【台词】现在私信“注销”，免费查公司状态，评估注销费用。`,
+          cover: "大字：公司不经营，正规注销\n小字：景洪本地 · 查异常 · 一站式注销",
+          comments: [
+            { question: "注销要多久？", answer: "没异常的话1-2个月，有异常要先处理。" },
+            { question: "注销贵吗？", answer: "看公司情况，有异常会贵一些，私信评估。" }
+          ],
+          cta: "评论‘注销’，免费查公司状态"
+        },
+        {
+          titles: [
+            "公司被吊销了还能注销吗？",
+            "营业执照吊销不等于注销，景洪老板注意",
+            "异常公司注销，先把这些问题处理好"
+          ],
+          script: `【画面】老板收到营业执照被吊销的通知
+【台词】很多老板以为营业执照被吊销了，公司就自动没了。其实不是，吊销只是行政处罚，公司主体还在，该补的税、该处理的异常一样不能少。
+
+【画面】顾问列出一堆异常：未年报、税务异常、地址异常
+【台词】要注销这类公司，先要把年报补了、税务异常解除了、罚款交了，才能走注销流程。
+
+【画面】工作人员逐项处理异常
+【台词】我们专门处理疑难注销，帮你查清公司状态、补齐材料、走完整套流程。
+
+【画面】结尾
+【台词】现在私信“疑难注销”，免费评估你的公司能不能注销、要花多少钱。`,
+          cover: "大字：吊销不等于注销\n小字：景洪本地 · 异常处理 · 疑难注销",
+          comments: [
+            { question: "被吊销了法人有什么影响？", answer: "会影响征信、限制高消费、以后不能当法人，要尽快处理。" },
+            { question: "处理完异常就能注销吗？", answer: "一般可以呢，具体要看异常类型。" }
+          ],
+          cta: "私信‘疑难注销’，免费评估费用"
+        },
+        {
+          titles: [
+            "景洪公司简易注销，20多天就能办完",
+            "没有债权债务的公司，注销可以走简易流程",
+            "别再把不经营的公司放着不管了"
+          ],
+          script: `【画面】老板看着不经营的公司营业执照
+【台词】公司不干了，又没债权债务、没税务异常，其实可以走简易注销，比普通注销快得多。
+
+【画面】简易注销流程展示
+【台词】简易注销先在国家企业信用信息公示系统公示20天，公示期满无异议，就可以申请注销工商登记，流程简单、时间短。
+
+【画面】专业团队代办注销
+【台词】我们帮你判断公司是否符合简易注销条件，准备材料、提交公示、办理注销，全程不用你跑腿。
+
+【画面】结尾
+【台词】现在私信“简易注销”，免费查你的公司能不能走简易流程。`,
+          cover: "大字：公司不经营，简易注销20多天\n小字：景洪本地 · 查条件 · 全程代办",
+          comments: [
+            { question: "简易注销需要什么条件？", answer: "没债权债务、没税务异常、没被处罚过，具体私信帮你查。" },
+            { question: "简易注销和普通注销差多久？", answer: "简易注销20多天，普通注销2-3个月呢。" }
+          ],
+          cta: "私信‘简易注销’，免费查条件"
+        }
+      ]
+    };
+
+    function getLocalTemplate(service) {
+      const list = COPY_TEMPLATES[service] || COPY_TEMPLATES.dailizhang;
+      const idx = Math.floor(Math.random() * list.length);
+      return JSON.parse(JSON.stringify(list[idx]));
+    }
+
+    function getServiceName(value) {
+      const map = {
+        dailizhang: '代理记账',
+        zhucegongsi: '注册公司',
+        gongshangbiangeng: '工商变更',
+        shuiwuchouhua: '税务筹划',
+        zizhudaili: '资质代办',
+        caishuizixun: '财税咨询',
+        gongsizhuxiao: '公司注销',
+      };
+      return map[value] || '财税服务';
+    }
+
+    function getServiceDesc(value) {
+      const map = {
+        dailizhang: '代理记账服务，记账+报税+开票+异常处理',
+        zhucegongsi: '公司注册服务，核名+执照+刻章+开户',
+        gongshangbiangeng: '工商变更服务，法人/股权/地址/经营范围变更',
+        shuiwuchouhua: '税务筹划服务，合法合规降低企业税负',
+        zizhudaili: '资质代办服务，食品经营/卫生许可等证照代办',
+        caishuizixun: '财税咨询服务，财务外包/旧账整理/经营分析',
+        gongsizhuxiao: '公司注销服务，税务注销+工商注销+银行注销',
+      };
+      return map[value] || '专业财税服务';
+    }
+
+    // ========== 页面元素 ==========
+    const serviceTags = document.getElementById('serviceTags');
+    const demandInput = document.getElementById('demandInput');
+    const generateBtn = document.getElementById('generateBtn');
+    const aiBtn = document.getElementById('aiBtn');
+    const resultCard = document.getElementById('resultCard');
+    const titlesList = document.getElementById('titlesList');
+    const scriptText = document.getElementById('scriptText');
+    const coverText = document.getElementById('coverText');
+    const commentsList = document.getElementById('commentsList');
+    const ctaText = document.getElementById('ctaText');
+    const resultTag = document.getElementById('resultTag');
+    const resultNotice = document.getElementById('resultNotice');
+    const toast = document.getElementById('toast');
+    const voiceBtn = document.getElementById('voiceBtn');
+    const voiceBtnText = document.getElementById('voiceBtnText');
+    const voiceStatus = document.getElementById('voiceStatus');
+    const voiceTip = document.getElementById('voiceTip');
+    const recordingOverlay = document.getElementById('recordingOverlay');
+    const recordingTime = document.getElementById('recordingTime');
+    const settingsToggle = document.getElementById('settingsToggle');
+    const settingsPanel = document.getElementById('settingsPanel');
+    const settingsArrow = document.getElementById('settingsArrow');
+    const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+    const syncFeishuBtn = document.getElementById('syncFeishuBtn');
+
+    // ========== 初始化 ==========
+    function init() {
+      loadSettings();
+      bindEvents();
+      checkVoiceSupport();
+      bindVoiceEvents();
+    }
+
+    function loadSettings() {
+      document.getElementById('apiKey').value = localStorage.getItem('caishui_apiKey') || '';
+      document.getElementById('baseURL').value = localStorage.getItem('caishui_baseURL') || 'https://ark.cn-beijing.volces.com/api/v3';
+      document.getElementById('modelName').value = localStorage.getItem('caishui_modelName') || 'doubao-seed-2-1-pro-260628';
+      document.getElementById('feishuAppId').value = localStorage.getItem('caishui_feishuAppId') || '';
+      document.getElementById('feishuAppSecret').value = localStorage.getItem('caishui_feishuAppSecret') || '';
+    }
+
+    function saveSettings() {
+      localStorage.setItem('caishui_apiKey', document.getElementById('apiKey').value.trim());
+      localStorage.setItem('caishui_baseURL', document.getElementById('baseURL').value.trim());
+      localStorage.setItem('caishui_modelName', document.getElementById('modelName').value.trim());
+      localStorage.setItem('caishui_feishuAppId', document.getElementById('feishuAppId').value.trim());
+      localStorage.setItem('caishui_feishuAppSecret', document.getElementById('feishuAppSecret').value.trim());
+      showToast('设置已保存');
+    }
+
+    function bindEvents() {
+      serviceTags.addEventListener('click', (e) => {
+        if (e.target.classList.contains('tag')) {
+          document.querySelectorAll('#serviceTags .tag').forEach(t => t.classList.remove('active'));
+          e.target.classList.add('active');
+          state.service = e.target.dataset.value;
+        }
+      });
+
+      demandInput.addEventListener('input', (e) => {
+        state.demand = e.target.value;
+      });
+
+      document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
+      document.getElementById('testApiBtn').addEventListener('click', testAPI);
+      generateBtn.addEventListener('click', generateFast);
+      aiBtn.addEventListener('click', generateAI);
+      syncFeishuBtn.addEventListener('click', syncToFeishu);
+
+      settingsToggle.addEventListener('click', toggleSettings);
+
+      document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', () => copyText(btn.dataset.text));
+      });
+    }
+
+    function toggleSettings() {
+      state.settingsOpen = !state.settingsOpen;
+      settingsPanel.classList.toggle('open', state.settingsOpen);
+      settingsArrow.textContent = state.settingsOpen ? '▲' : '▼';
+    }
+
+    // ========== 语音输入（兼容手机/微信/Chrome/Safari） ==========
+    let recognition = null;
+    let recognizing = false;
+    let finalTranscript = '';
+    let interimTranscript = '';
+    let recordTimer = null;
+    let silenceTimer = null;
+    let seconds = 0;
+    let voiceStartTimer = null;
+    let voiceStopTimer = null;
+    let isTouchDevice = false;
+    let isPointerDown = false;
+    let hasVoiceSupport = false;
+
+    function detectEnv() {
+      const ua = navigator.userAgent.toLowerCase();
+      const isWechat = /micromessenger/.test(ua);
+      const isIOS = /iphone|ipad|ipod/.test(ua);
+      const isAndroid = /android/.test(ua);
+      const isMobile = isIOS || isAndroid;
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      return { isWechat, isIOS, isAndroid, isMobile, SpeechRecognition };
+    }
+
+    function checkVoiceSupport() {
+      const env = detectEnv();
+      hasVoiceSupport = !!env.SpeechRecognition;
+
+      if (!hasVoiceSupport) {
+        voiceBtn.disabled = true;
+        voiceBtnText.textContent = '当前浏览器不支持语音';
+        voiceBtn.style.opacity = '0.6';
+        voiceStatus.textContent = '请换 Chrome/Edge/ Safari 浏览器';
+        voiceTip.textContent = env.isWechat
+          ? '微信内置浏览器不支持语音识别，可点击右上角“在浏览器打开”用 Chrome/Safari。'
+          : '当前浏览器不支持 Web Speech API，建议换 Chrome/Edge/Safari。';
+        return;
+      }
+
+      if (env.isWechat) {
+        voiceTip.textContent = '微信内可直接使用；若语音不稳定，点击右上角“在浏览器打开”体验更佳。';
+      }
+
+      const isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+      const isHttps = location.protocol === 'https:';
+      if (!isHttps && !isLocalhost) {
+        voiceStatus.textContent = '当前为非 HTTPS 页面，语音可能无法使用';
+        voiceTip.textContent = '请部署到 HTTPS（如 GitHub Pages）后再试语音功能。';
+      }
+    }
+
+    function bindVoiceEvents() {
+      const env = detectEnv();
+      isTouchDevice = env.isMobile;
+
+      if (env.isMobile) {
+        voiceBtn.addEventListener('touchstart', handleTouchStart, { passive: false });
+        voiceBtn.addEventListener('touchend', handleTouchEnd, { passive: false });
+        voiceBtn.addEventListener('touchcancel', handleTouchEnd, { passive: false });
+        voiceBtn.addEventListener('touchmove', (e) => { if (recognizing) e.preventDefault(); }, { passive: false });
+      } else {
+        voiceBtn.addEventListener('pointerdown', handlePointerDown, { passive: false });
+        voiceBtn.addEventListener('pointerup', handlePointerUp, { passive: false });
+        voiceBtn.addEventListener('pointercancel', handlePointerUp, { passive: false });
+        voiceBtn.addEventListener('pointerleave', handlePointerUp, { passive: false });
+      }
+
+      voiceBtn.addEventListener('contextmenu', (e) => e.preventDefault());
+      voiceBtn.addEventListener('selectstart', (e) => e.preventDefault());
+    }
+
+    function handleTouchStart(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      isPointerDown = true;
+      if (recognizing) {
+        stopVoice();
+      } else {
+        startVoice();
+      }
+    }
+
+    function handleTouchEnd(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      isPointerDown = false;
+      if (recognizing) {
+        voiceStopTimer = setTimeout(() => stopVoice(), 300);
+      }
+    }
+
+    function handlePointerDown(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      isPointerDown = true;
+
+      if (recognizing) {
+        stopVoice();
+        return;
+      }
+
+      startVoice();
+
+      document.addEventListener('pointerup', handleGlobalPointerUp, { once: true });
+      document.addEventListener('pointercancel', handleGlobalPointerUp, { once: true });
+    }
+
+    function handlePointerUp(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      isPointerDown = false;
+      if (recognizing) {
+        voiceStopTimer = setTimeout(() => stopVoice(), 300);
+      }
+    }
+
+    function handleGlobalPointerUp(e) {
+      isPointerDown = false;
+      if (recognizing) {
+        voiceStopTimer = setTimeout(() => stopVoice(), 300);
+      }
+    }
+
+    function startVoice() {
+      const env = detectEnv();
+      const SpeechRecognition = env.SpeechRecognition;
+      if (!SpeechRecognition) {
+        showToast('当前浏览器不支持语音识别');
+        return;
+      }
+
+      if (recognizing) return;
+
+      const isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+      const isHttps = location.protocol === 'https:';
+      if (!isHttps && !isLocalhost) {
+        showToast('语音功能需要 HTTPS，请先部署到 GitHub Pages');
+        voiceStatus.textContent = '语音需要 HTTPS 页面';
+        return;
+      }
+
+      finalTranscript = '';
+      interimTranscript = '';
+      seconds = 0;
+      clearTimeout(voiceStopTimer);
+
+      recognition = new SpeechRecognition();
+      recognition.lang = 'zh-CN';
+      recognition.continuous = !env.isMobile;
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 1;
+
+      let hasStarted = false;
+
+      recognition.onstart = () => {
+        hasStarted = true;
+        recognizing = true;
+        voiceBtn.classList.add('recording');
+        voiceBtnText.textContent = env.isMobile ? '松开结束' : '点击停止';
+        voiceStatus.textContent = '正在听，请说话...';
+        recordingOverlay.classList.add('show');
+        document.body.style.overflow = 'hidden';
+        startRecordTimer();
+        clearTimeout(voiceStartTimer);
+        if (env.isMobile && navigator.vibrate) {
+          navigator.vibrate(30);
+        }
+      };
+
+      recognition.onresult = (event) => {
+        interimTranscript = '';
+        let hasFinal = false;
+
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript;
+            hasFinal = true;
+          } else {
+            interimTranscript += transcript;
+          }
+        }
+
+        updateInputText();
+
+        if (hasFinal) {
+          resetSilenceTimer();
+        }
+      };
+
+      recognition.onerror = (event) => {
+        console.error('语音识别错误:', event.error);
+        clearTimeout(voiceStartTimer);
+        if (event.error === 'not-allowed') {
+          voiceStatus.textContent = '麦克风权限被拒绝';
+          showToast('请允许麦克风权限，并确保使用 HTTPS 页面');
+        } else if (event.error === 'network') {
+          voiceStatus.textContent = '语音识别网络异常';
+          showToast('网络异常，语音识别失败');
+        } else if (event.error === 'no-speech') {
+          voiceStatus.textContent = '没有检测到声音';
+          showToast('没有检测到声音');
+        } else if (event.error === 'audio-capture') {
+          voiceStatus.textContent = '无法访问麦克风';
+          showToast('无法访问麦克风');
+        } else if (event.error !== 'aborted') {
+          voiceStatus.textContent = '语音识别失败：' + event.error;
+          showToast('语音识别失败，请重试');
+        }
+        safeResetVoiceUI();
+      };
+
+      recognition.onend = () => {
+        if (finalTranscript || interimTranscript) {
+          state.demand = state.demand + finalTranscript + interimTranscript;
+          demandInput.value = state.demand;
+        }
+        safeResetVoiceUI();
+      };
+
+      voiceStatus.textContent = '正在启动语音...';
+      try {
+        recognition.start();
+        voiceStartTimer = setTimeout(() => {
+          if (!hasStarted) {
+            voiceStatus.textContent = '语音启动超时，请重试';
+            showToast('语音启动超时，建议换浏览器或检查权限');
+            safeResetVoiceUI();
+          }
+        }, 4000);
+      } catch (err) {
+        showToast('语音启动失败：' + err.message);
+        safeResetVoiceUI();
+      }
+    }
+
+    function stopVoice() {
+      clearTimeout(voiceStartTimer);
+      clearTimeout(silenceTimer);
+      clearTimeout(voiceStopTimer);
+      try {
+        if (recognition && recognizing) {
+          recognition.stop();
+        } else {
+          safeResetVoiceUI();
+        }
+      } catch (err) {
+        safeResetVoiceUI();
+      }
+    }
+
+    function updateInputText() {
+      demandInput.value = state.demand + finalTranscript + interimTranscript;
+    }
+
+    function resetSilenceTimer() {
+      clearTimeout(silenceTimer);
+      silenceTimer = setTimeout(() => {
+        if (recognizing) {
+          stopVoice();
+          showToast('检测到停顿，已自动结束');
+        }
+      }, 2500);
+    }
+
+    function startRecordTimer() {
+      recordTimer = setInterval(() => {
+        seconds++;
+        const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+        const s = (seconds % 60).toString().padStart(2, '0');
+        recordingTime.textContent = `${m}:${s}`;
+
+        if (seconds >= 60) {
+          stopVoice();
+          showToast('单次录音最长60秒');
+        }
+      }, 1000);
+    }
+
+    function safeResetVoiceUI() {
+      clearTimeout(voiceStartTimer);
+      clearTimeout(silenceTimer);
+      clearTimeout(voiceStopTimer);
+      try {
+        if (recognition && recognizing) {
+          recognition.stop();
+        }
+      } catch (e) {}
+      resetVoiceUI();
+    }
+
+    function resetVoiceUI() {
+      recognizing = false;
+      voiceBtn.classList.remove('recording');
+      voiceBtnText.textContent = '按住说话';
+      voiceStatus.textContent = '';
+      recordingOverlay.classList.remove('show');
+      document.body.style.overflow = '';
+      clearInterval(recordTimer);
+      clearTimeout(silenceTimer);
+      clearTimeout(voiceStartTimer);
+      clearTimeout(voiceStopTimer);
+      seconds = 0;
+      recordingTime.textContent = '00:00';
+      recognition = null;
+      isPointerDown = false;
+    }
+
+    // ========== 文案生成 ==========
+    function buildSystemPrompt() {
+      return `你是一个只服务财税公司的营销文案高手，专门产出适合“巨量本地推”的硬广文案。
+
+## 风格要求
+- 口语化，像景洪本地人聊天，可自然用“嘛”“呢”“噶”“了嘛”“整”“捋清楚”“吃亏”等语气词
+- 说人话，把“税务异常”“汇算清缴”翻译成老百姓听得懂的大白话
+- 有痛点，先戳老板的焦虑、麻烦、冤枉钱
+- 给方案，再给出简单直接的服务价值
+- 促行动，结尾必有明确的预约、咨询、到店、私信引导
+
+## 爆款结构
+1. 钩子开场（3秒抓人）
+2. 痛点放大
+3. 解决方案
+4. 信任背书（本地、专业、响应快）
+5. 限时福利/行动号召
+
+## 输出格式
+每次必须按 JSON 格式返回，不要包含其他说明：
+{
+  "titles": ["标题1", "标题2", "标题3"],
+  "script": "完整口播脚本，含画面提示",
+  "cover": "封面大字+小字文案",
+  "comments": [
+    {"question": "客户常见问题", "answer": "回复话术"}
+  ],
+  "cta": "行动号召话术"
+}`;
+    }
+
+    function buildUserPrompt() {
+      const serviceName = getServiceName(state.service);
+      const serviceDesc = getServiceDesc(state.service);
+      const demand = state.demand.trim();
+      return `业务：${serviceName}（${serviceDesc}）\n${demand ? '额外要求：' + demand + '\n' : ''}请直接返回 JSON 格式文案。`;
+    }
+
+    // ========== 极速生成：本地模板，1 秒内出结果，不依赖 API ==========
+    function generateFast() {
+      setLoading(true, 'fast');
+      setTimeout(() => {
+        try {
+          generateLocal('本地极速模板生成，无需等待，随时可用');
+        } catch (err) {
+          console.error('本地生成出错:', err);
+          generateLocal('本地模板生成（已自动恢复）');
+        } finally {
+          setLoading(false, 'fast');
+        }
+      }, 80);
+    }
+
+    // ========== AI 智能生成：调用大模型，失败或超时时自动降级本地模板 ==========
+    async function generateAI() {
+      const apiKey = localStorage.getItem('caishui_apiKey');
+      const baseURL = localStorage.getItem('caishui_baseURL');
+      const model = localStorage.getItem('caishui_modelName');
+
+      if (!apiKey) {
+        showToast('未填写 API 密钥，先用本地极速模板生成');
+        generateFast();
+        return;
+      }
+
+      setLoading(true, 'ai');
+      let apiSucceed = false;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 6000);
+
+      try {
+        const response = await fetch(`${baseURL}/chat/completions`, {
+          method: 'POST',
+          signal: controller.signal,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`,
+          },
+          body: JSON.stringify({
+            model: model,
+            messages: [
+              { role: 'system', content: buildSystemPrompt() },
+              { role: 'user', content: buildUserPrompt() },
+            ],
+            temperature: 0.8,
+          }),
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          let errMsg = `请求失败：${response.status}`;
+          try {
+            const err = await response.json();
+            errMsg = err.error?.message || err.message || errMsg;
+          } catch (e) {}
+          throw new Error(errMsg);
+        }
+
+        const data = await response.json();
+        if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+          throw new Error('API 返回数据异常，请检查模型名称');
+        }
+        const content = data.choices[0].message.content;
+        const result = parseResult(content);
+        state.lastResult = result;
+        renderResult(result, 'AI 智能生成');
+        apiSucceed = true;
+      } catch (err) {
+        clearTimeout(timeoutId);
+        console.error('API 生成失败，降级本地模板:', err);
+      }
+
+      if (!apiSucceed) {
+        generateLocal('API 响应较慢或失败，已自动切换本地极速模板，保证 10 秒内出结果');
+      }
+
+      setLoading(false, 'ai');
+    }
+
+    function generateLocal(notice) {
+      const tpl = getLocalTemplate(state.service);
+      const serviceName = getServiceName(state.service);
+
+      const result = {
+        titles: tpl.titles,
+        script: tpl.script,
+        cover: tpl.cover,
+        comments: tpl.comments,
+        cta: tpl.cta,
+      };
+
+      // 如果用户有额外需求，尝试简单替换关键词
+      const demand = state.demand.trim();
+      if (demand) {
+        result.titles = result.titles.map(t => t + (demand.includes('便宜') || demand.includes('价格') ? '，价格透明不吃亏' : ''));
+      }
+
+      state.lastResult = result;
+      renderResult(result, '本地极速模板', notice || '本地极速模板生成');
+    }
+
+    function parseResult(content) {
+      try {
+        // 尝试提取 JSON 代码块
+        const jsonMatch = content.match(/```json\s*([\s\S]*?)```/) || content.match(/```\s*([\s\S]*?)```/);
+        const jsonStr = jsonMatch ? jsonMatch[1].trim() : content.trim();
+        return JSON.parse(jsonStr);
+      } catch (err) {
+        console.error('解析 AI 返回失败:', err);
+        // 返回一个兜底结果
+        const tpl = getLocalTemplate(state.service);
+        return {
+          titles: tpl.titles,
+          script: tpl.script,
+          cover: tpl.cover,
+          comments: tpl.comments,
+          cta: tpl.cta,
+        };
+      }
+    }
+
+    function renderResult(result, tag, notice) {
+      resultTag.textContent = tag;
+      resultNotice.textContent = notice || '';
+
+      titlesList.innerHTML = (result.titles || []).map((t, i) => `
+        <div class="copy-item">
+          <div class="copy-text">${i + 1}. ${t}</div>
+          <button class="copy-btn" data-text="${escapeHtml(t)}">复制</button>
+        </div>
+      `).join('');
+
+      scriptText.textContent = result.script || '';
+      coverText.textContent = result.cover || '';
+      ctaText.textContent = result.cta || '';
+
+      commentsList.innerHTML = (result.comments || []).map(c => `
+        <div class="copy-item">
+          <div class="copy-text">
+            <strong>问：${c.question}</strong><br>
+            答：${c.answer}
+          </div>
+          <button class="copy-btn" data-text="${escapeHtml(c.question + '\n' + c.answer)}">复制</button>
+        </div>
+      `).join('');
+
+      document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', () => copyText(btn.dataset.text));
+      });
+
+      resultCard.classList.add('open');
+      setTimeout(() => {
+        resultCard.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast('已复制');
+      } catch (err) {
+        // 降级方案
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToast('已复制');
+      }
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2000);
+    }
+
+    function setLoading(loading, mode) {
+      state.generating = loading;
+      generateBtn.disabled = loading;
+      aiBtn.disabled = loading;
+      if (loading) {
+        generateBtn.innerHTML = mode === 'ai'
+          ? '<span class="loading"></span>AI 正在写文案...'
+          : '<span class="loading"></span>极速生成中...';
+      } else {
+        generateBtn.innerHTML = '立即生成文案（本地模板，1秒出稿）';
+      }
+    }
+
+    // ========== API 测试 ==========
+    async function testAPI() {
+      const apiKey = document.getElementById('apiKey').value.trim();
+      const baseURL = document.getElementById('baseURL').value.trim();
+      const model = document.getElementById('modelName').value.trim();
+      const statusEl = document.getElementById('apiStatus');
+
+      if (!apiKey) {
+        statusEl.textContent = '请先填写 API 密钥';
+        statusEl.className = 'api-status error';
+        return;
+      }
+
+      statusEl.textContent = '正在测试连接...';
+      statusEl.className = 'api-status';
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
+        const response = await fetch(`${baseURL}/chat/completions`, {
+          method: 'POST',
+          signal: controller.signal,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`,
+          },
+          body: JSON.stringify({
+            model: model,
+            messages: [
+              { role: 'user', content: '你好' }
+            ],
+            max_tokens: 5,
+          }),
+        });
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+          statusEl.textContent = '✅ API 连接成功';
+          statusEl.className = 'api-status success';
+        } else {
+          const err = await response.json().catch(() => ({}));
+          statusEl.textContent = `❌ 连接失败：${err.error?.message || response.statusText || response.status}`;
+          statusEl.className = 'api-status error';
+        }
+      } catch (err) {
+        statusEl.textContent = `❌ 连接失败：${err.message || '请检查网络或接口地址'}`;
+        statusEl.className = 'api-status error';
+      }
+    }
+
+    // ========== 飞书同步 ==========
+    async function syncToFeishu() {
+      if (!state.lastResult) {
+        showToast('请先生成文案');
+        return;
+      }
+
+      const appId = document.getElementById('feishuAppId').value.trim();
+      const appSecret = document.getElementById('feishuAppSecret').value.trim();
+
+      if (!appId || !appSecret) {
+        showToast('请填写飞书 App ID 和 App Secret');
+        return;
+      }
+
+      showToast('正在同步到飞书...');
+
+      try {
+        // 1. 获取 tenant_access_token
+        const tokenRes = await fetch('https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ app_id: appId, app_secret: appSecret })
+        });
+        const tokenData = await tokenRes.json();
+        if (tokenData.code !== 0) {
+          throw new Error(tokenData.msg || '获取飞书 token 失败');
+        }
+        const token = tokenData.tenant_access_token;
+
+        // 2. 创建文档
+        const createRes = await fetch('https://open.feishu.cn/open-apis/docx/v1/documents', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            title: `财税文案 - ${getServiceName(state.service)} - ${new Date().toLocaleString()}`
+          })
+        });
+        const createData = await createRes.json();
+        if (createData.code !== 0) {
+          throw new Error(createData.msg || '创建文档失败');
+        }
+        const docId = createData.data.document.document_id;
+
+        // 3. 添加内容
+        const result = state.lastResult;
+        const blocks = [
+          { block_type: 2, text: { elements: [{ text_run: { content: result.titles?.[0] || '财税文案' } }] } },
+          { block_type: 3, text: { elements: [{ text_run: { content: result.script || '' } }] } },
+        ];
+
+        await fetch(`https://open.feishu.cn/open-apis/docx/v1/documents/${docId}/blocks/${docId}/children`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ children: blocks })
+        });
+
+        showToast('已同步到飞书文档');
+      } catch (err) {
+        console.error('飞书同步失败:', err);
+        showToast('飞书同步失败：' + err.message);
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
