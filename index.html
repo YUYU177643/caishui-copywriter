@@ -262,27 +262,23 @@
 
 /* ---------- ① 巨量本地推合规引擎 ---------- */
 const ComplianceEngine = (() => {
-  // 极限词 / 绝对化用语（广告法第九条）
   const absoluteWords = [
     '最','最佳','最优','最好','最大','最小','最高','最低','最快','最慢','最便宜','最划算',
     '第一','唯一','首个','首选','独家','绝无仅有','前无古人','后无来者',
     '顶级','顶尖','极品','极致','完美','无敌','万能','神器之王',
     '国家级','世界级','全球领先','行业领先','龙头','鼻祖','之王'
   ];
-  // 财税行业违禁承诺（巨量本地推重点管控）
   const forbiddenTax = [
     '节税','避税','偷税','漏税','逃税','少交税','不交税','永不交税',
     '节税90','节税80','节税70','节税60','节税50','大额核定','园区返还','税收返还',
     '零风险','包过','包拿证','保过','保证通过','保证下证','一定能办','百分百通过',
     '虚开','买卖发票','私户避税','账外收入','两本账'
   ];
-  // 虚假宣传 / 误导性词汇
   const misleadingWords = [
     '免费','白嫖','零元','0元','不要钱','无偿',
     '稳赚','暴富','躺赚','一夜暴富','财富自由','年入百万',
     '包治','根治','无效退款','假一赔十'
   ];
-  // 合规替换建议
   const replacements = {
     '最佳':'优质','最优':'优选','最好':'很好','最大':'很大','最高':'很高','最低':'较低','最快':'很快','最便宜':'实惠',
     '第一':'领先','唯一':'少有的','首个':'较早的','首选':'推荐','独家':'特色','顶级':'高端','极品':'精品','完美':'出色',
@@ -294,7 +290,6 @@ const ComplianceEngine = (() => {
     '稳赚':'稳健','暴富':'增收','躺赚':'轻松经营','年入百万':'提升收益',
     '无效退款':'满意为止','假一赔十':'品质保障'
   };
-  // 财税行业合规提示
   const taxTips = [
     '税务筹划类文案：避免承诺具体节税比例，建议表述为"合法享受小微企业税收优惠"',
     '代理记账类文案：避免"零风险""包过"，建议表述为"专业团队、规范操作"',
@@ -304,36 +299,24 @@ const ComplianceEngine = (() => {
 
   function scan(text) {
     const issues = [];
-    for (const w of absoluteWords) {
-      if (text.includes(w)) issues.push({word: w, type: '极限词', level: 'high'});
-    }
-    for (const w of forbiddenTax) {
-      if (text.includes(w)) issues.push({word: w, type: '财税违禁', level: 'high'});
-    }
-    for (const w of misleadingWords) {
-      if (text.includes(w)) issues.push({word: w, type: '误导宣传', level: 'mid'});
-    }
+    for (const w of absoluteWords) if (text.includes(w)) issues.push({word: w, type: '极限词', level: 'high'});
+    for (const w of forbiddenTax) if (text.includes(w)) issues.push({word: w, type: '财税违禁', level: 'high'});
+    for (const w of misleadingWords) if (text.includes(w)) issues.push({word: w, type: '误导宣传', level: 'mid'});
     return issues;
   }
-
   function sanitize(text) {
     let result = text;
-    for (const [bad, good] of Object.entries(replacements)) {
-      result = result.split(bad).join(good);
-    }
+    for (const [bad, good] of Object.entries(replacements)) result = result.split(bad).join(good);
     return result;
   }
-
   function score(text) {
     const issues = scan(text);
     const highCount = issues.filter(i => i.level === 'high').length;
     const midCount = issues.filter(i => i.level === 'mid').length;
-    // 基础分100，高危-15，中危-8
     let s = 100 - highCount * 15 - midCount * 8;
     s = Math.max(0, Math.min(100, s));
     return { score: s, level: s >= 85 ? 'high' : (s >= 60 ? 'mid' : 'low'), issues };
   }
-
   return { scan, sanitize, score, taxTips, forbiddenTax, absoluteWords, misleadingWords };
 })();
 
@@ -411,26 +394,21 @@ const SERVICES = {
 /* ---------- ④ 生成引擎 ---------- */
 function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 function pickN(arr, n) {
-  const copy = [...arr];
-  const result = [];
+  const copy = [...arr]; const result = [];
   for (let i = 0; i < n && copy.length; i++) {
     const idx = Math.floor(Math.random() * copy.length);
     result.push(copy.splice(idx, 1)[0]);
   }
   return result;
 }
-
-// 景洪本地元素
 const JINGHONG = {
   places: ['告庄西双景','星光夜市','泼水广场','曼听公园','嘎洒','勐泐','澜沧江边','大金塔'],
   food: ['傣味','舂鸡脚','菠萝饭','香茅草烤鱼','手抓饭'],
   vibe: ['在景洪','在版纳','咱们西双版纳','告庄这边','嘎洒这边']
 };
-
-// 根据需求关键词调整
 function parseDemand(demand) {
   const d = (demand || '').toLowerCase();
-  const opts = {
+  return {
     cheap: /便宜|实惠|划算|价格|低价|省钱/.test(d),
     local: /本地|景洪|版纳|西双版纳|告庄|嘎洒/.test(d),
     urgent: /急|紧迫|限时|抓紧|马上|赶紧/.test(d),
@@ -439,151 +417,114 @@ function parseDemand(demand) {
     video: /口播|视频|短视频|抖音|说/.test(d),
     formal: /正式|专业|高端|品牌/.test(d)
   };
-  return opts;
 }
 
-// 生成单条文案
 function generateOne(serviceKey, styleKey, demand) {
   const svc = SERVICES[serviceKey];
   const opts = parseDemand(demand);
   const style = styleKey === 'random' ? pick(Object.keys(STYLES).filter(k => k !== 'random')) : styleKey;
-
   const pain = pick(svc.painPoints);
   const benefit1 = pick(svc.benefits);
   const benefit2 = pick(svc.benefits.filter(b => b !== benefit1));
   const price = svc.priceAnchor;
   const target = svc.target;
-
   let title = '', cover = '', script = '', comment = '';
   const localPrefix = opts.local ? pick(JINGHONG.vibe) + ' ' : '';
 
   switch (style) {
-    case 'pain': {
+    case 'pain':
       title = `${localPrefix}做${svc.name}的老板注意了！这个坑别再踩了`;
       cover = `${pain}？\n${svc.name}找对人很重要`;
       script = `你是不是也遇到过这种情况：${pain}\n\n很多老板就是因为不重视${svc.name}，吃了大亏。其实不用自己折腾，交给专业团队就行。\n\n我们做${svc.name}，${benefit1}，${benefit2}。${opts.cheap ? price + '，' : ''}${target}都在用。\n\n有需要的老板，评论区扣"1"，我帮你看看。`;
-      comment = '扣"1"领取免费咨询名额';
-      break;
-    }
+      comment = '扣"1"领取免费咨询名额'; break;
     case 'number': {
       const num = pick([3, 5, 8, 10, 99, 200, 500]);
       const unit = pick(['家','位','个']);
       title = `在景洪，已经有${num}${unit}老板选择了我们的${svc.name}服务`;
       cover = `${num}${unit}老板的选择\n${svc.name}就找我们`;
       script = `告诉你一个数字：在景洪，已经有${num}${unit}老板，选择了我们做${svc.name}。\n\n为什么这么多人选我们？因为我们${benefit1}，${benefit2}。\n\n${opts.cheap ? '而且' + price + '，' : ''}专业的事交给专业的人，你只管好好做生意。\n\n想了解的老板，私信我。`;
-      comment = '已有' + num + unit + '老板选择，你还在等什么？';
-      break;
+      comment = '已有' + num + unit + '老板选择，你还在等什么？'; break;
     }
-    case 'rhetoric': {
+    case 'rhetoric':
       title = `在景洪做${svc.name}，你还在自己跑吗？`;
       cover = `${svc.name}还自己跑？\n难怪你这么累`;
       script = `在景洪做${svc.name}，你还在自己跑吗？\n\n是不是${pain}？\n\n为什么不找专业的人帮你做？我们做${svc.name}多年，${benefit1}，${benefit2}。\n\n${opts.cheap ? price + '，' : ''}省心又省力。\n\n评论区告诉我，你在${svc.name}上遇到最大的难题是什么？`;
-      comment = '你在' + svc.name + '上踩过哪些坑？评论区聊聊';
-      break;
-    }
-    case 'story': {
+      comment = '你在' + svc.name + '上踩过哪些坑？评论区聊聊'; break;
+    case 'story':
       title = `昨天一个景洪老板来找我做${svc.name}，一聊才知道...`;
       cover = `一个景洪老板的\n${svc.name}真实经历`;
       script = `昨天一个景洪的老板来找我做${svc.name}，一聊才知道，他之前${pain}，折腾了好久都没搞定。\n\n后来找到我们，我们${benefit1}，${benefit2}，很快就帮他处理好了。\n\n他说早知道就早点找你们了，省了好多事。\n\n${opts.cheap ? '而且我们' + price + '，' : ''}在景洪做${svc.name}，找我们就对了。有需要私信我。`;
-      comment = '专业的事交给专业的人，少走弯路';
-      break;
-    }
+      comment = '专业的事交给专业的人，少走弯路'; break;
     case 'authority': {
       const years = pick([5, 8, 10, 12]);
       title = `${svc.name}，我们做了${years}年，靠的就是专业和口碑`;
       cover = `${years}年专注\n${svc.name}`;
       script = `做${svc.name}，我们做了${years}年。\n\n${years}年来，我们服务了数百家企业，靠的就是专业和口碑。\n\n我们的团队${benefit1}，${benefit2}。每一个环节都严格把控，让你放心。\n\n${target}，如果你需要${svc.name}，欢迎来聊聊。`;
-      comment = years + '年专业经验，值得信赖';
-      break;
+      comment = years + '年专业经验，值得信赖'; break;
     }
     case 'urgency': {
       const deadline = pick(['本月底','本周内','这两天','年前']);
       title = `注意！${svc.name}优惠名额仅剩最后几个，${deadline}截止`;
       cover = `限时优惠\n${svc.name}名额告急`;
       script = `重要通知！我们${svc.name}的优惠名额，仅剩最后几个了，${deadline}截止。\n\n${opts.cheap ? price + '，' : ''}还送免费咨询。\n\n我们${benefit1}，${benefit2}。错过这次，下次不知道什么时候再有。\n\n想办理的老板，赶紧私信我，先到先得。`;
-      comment = '名额有限，先到先得，私信预约';
-      break;
+      comment = '名额有限，先到先得，私信预约'; break;
     }
     case 'local': {
       const place = pick(JINGHONG.places);
       title = `景洪${place}的老板注意，${svc.name}在家门口就能办`;
       cover = `景洪本地${svc.name}\n就在你身边`;
       script = `景洪${place}的老板们注意了！\n\n${svc.name}不用跑远，在家门口就能办。我们就在景洪，${benefit1}，${benefit2}。\n\n${opts.cheap ? price + '，' : ''}本地服务，沟通方便，随时能找到人。\n\n有需要的老板，评论区扣"1"，我联系你。`;
-      comment = '景洪本地服务，靠谱放心';
-      break;
+      comment = '景洪本地服务，靠谱放心'; break;
     }
-    case 'emotion': {
+    case 'emotion':
       title = `在景洪打拼的老板，${svc.name}这件事别再硬扛了`;
       cover = `老板，你辛苦了\n${svc.name}交给我们`;
       script = `在景洪打拼的老板，我知道你不容易。\n\n每天起早贪黑，既要管生意，又要操心${svc.name}。${pain}，这些难处我都懂。\n\n${svc.name}这件事，就别再自己硬扛了。交给我们，${benefit1}，${benefit2}。\n\n你只管安心做生意，后勤的事我们来。有需要随时找我。`;
-      comment = '老板辛苦了，财税的事交给我们';
-      break;
-    }
-    case 'contrast': {
+      comment = '老板辛苦了，财税的事交给我们'; break;
+    case 'contrast':
       title = `同样是${svc.name}，为什么有的老板省心，有的却踩坑？`;
       cover = `${svc.name}选错\n差别居然这么大`;
       script = `同样是${svc.name}，为什么有的老板省心省力，有的却踩坑不断？\n\n区别就在于：找对专业团队。\n\n不靠谱的：${pain}。\n\n找我们：${benefit1}，${benefit2}。\n\n${opts.cheap ? price + '，' : ''}专业和不专业，差距就是这么大。\n\n想省心的老板，私信我。`;
-      comment = '选对团队，少踩坑，私信了解';
-      break;
-    }
-    case 'suspense': {
+      comment = '选对团队，少踩坑，私信了解'; break;
+    case 'suspense':
       title = `做${svc.name}，90%的老板都忽略了这一点`;
       cover = `90%老板都忽略的\n${svc.name}关键点`;
       script = `做${svc.name}，90%的老板都忽略了这一点。\n\n很多人以为${svc.name}很简单，结果${pain}。\n\n其实，关键在于${benefit1}。我们做${svc.name}多年，${benefit2}，帮你避开这些坑。\n\n想知道具体怎么操作？评论区扣"1"，我发你详细方案。`;
-      comment = '想知道细节？扣"1"发你方案';
-      break;
-    }
-    case 'list': {
+      comment = '想知道细节？扣"1"发你方案'; break;
+    case 'list':
       title = `${svc.name}必看的3个关键点，第2个很多人都不知道`;
       cover = `${svc.name}3个关键点\n建议收藏`;
       script = `${svc.name}，记住这3点，少走很多弯路：\n\n第一，${benefit1}。\n\n第二，${benefit2}。\n\n第三，找专业的人做专业的事。\n\n${opts.cheap ? '我们' + price + '，' : ''}需要${svc.name}的老板，私信我领取详细指南。`;
-      comment = '干货分享，建议收藏，私信领指南';
-      break;
-    }
-    case 'dialogue': {
+      comment = '干货分享，建议收藏，私信领指南'; break;
+    case 'dialogue':
       title = `景洪老板：${svc.name}到底怎么办？一句话给你说清楚`;
       cover = `${svc.name}怎么办？\n一句话说清楚`;
       script = `老板：你好，我想做${svc.name}，怎么办？\n\n我：简单，交给我们就行。\n\n老板：靠谱吗？\n\n我：放心，我们${benefit1}，${benefit2}。${opts.cheap ? price + '。' : ''}\n\n老板：那行，怎么联系？\n\n我：评论区扣"1"，我马上联系你。`;
-      comment = '扣"1"，马上安排';
-      break;
-    }
+      comment = '扣"1"，马上安排'; break;
     case 'jinghong': {
       const place = pick(JINGHONG.places);
       const food = pick(JINGHONG.food);
       title = `景洪${place}的老板，${svc.name}这事我帮你捋清楚`;
       cover = `景洪本地${svc.name}\n懂版纳更懂你`;
       script = `景洪${place}的老板们，你们好！\n\n我是在版纳做${svc.name}的，咱们这边的老板做生意实在，${svc.name}这事也得找实在人。\n\n我们${benefit1}，${benefit2}。${opts.cheap ? price + '，' : ''}就像咱们吃${food}一样，实在、靠谱。\n\n有需要的老板，来告庄找我喝茶，慢慢聊。`;
-      comment = '版纳实在人办实在事，喝茶聊聊';
-      break;
+      comment = '版纳实在人办实在事，喝茶聊聊'; break;
     }
-    default: {
+    default:
       title = `${localPrefix}${svc.name}，专业团队为你服务`;
       cover = `${svc.name}\n专业团队`;
       script = `${localPrefix}需要${svc.name}的老板看过来！\n\n我们${benefit1}，${benefit2}。${opts.cheap ? price + '，' : ''}${target}都在选择我们。\n\n有需要私信我。`;
       comment = '专业服务，私信了解';
-    }
   }
 
-  // 合规处理
   const cleanScript = ComplianceEngine.sanitize(script);
   const cleanTitle = ComplianceEngine.sanitize(title);
   const cleanCover = ComplianceEngine.sanitize(cover);
   const cleanComment = ComplianceEngine.sanitize(comment);
   const fullText = cleanTitle + cleanCover + cleanScript + cleanComment;
   const compliance = ComplianceEngine.score(fullText);
-
-  return {
-    style: STYLES[style].name,
-    styleKey: style,
-    title: cleanTitle,
-    cover: cleanCover,
-    script: cleanScript,
-    comment: cleanComment,
-    compliance
-  };
+  return { style: STYLES[style].name, styleKey: style, title: cleanTitle, cover: cleanCover, script: cleanScript, comment: cleanComment, compliance };
 }
 
-// 批量生成
 function generateBatch(serviceKey, styleKey, count, demand) {
   const results = [];
   const usedStyles = new Set();
@@ -604,10 +545,7 @@ async function generateAI(serviceKey, styleKey, count, demand) {
   const apiKey = document.getElementById('apiKey').value.trim();
   const baseURL = document.getElementById('baseURL').value.trim() || 'https://ark.cn-beijing.volces.com/api/v3';
   const model = document.getElementById('modelName').value.trim() || 'doubao-seed-2-1-pro-260628';
-  if (!apiKey) {
-    showToast('请先在设置中填写 API 密钥');
-    return null;
-  }
+  if (!apiKey) { showToast('请先在设置中填写 API 密钥'); return null; }
   const svc = SERVICES[serviceKey];
   const style = styleKey === 'random' ? '随机爆款风格' : STYLES[styleKey].name;
   const systemPrompt = `你是一位资深财税营销文案专家，专为巨量本地推（抖音本地生活广告）创作合规爆款文案。
@@ -617,66 +555,49 @@ async function generateAI(serviceKey, styleKey, count, demand) {
 3. 严禁虚假宣传（免费、稳赚、暴富等）；
 4. 文案必须真实、合规，经得起巨量本地推审核；
 5. 风格口语化、接地气，适合短视频口播；
-6. 输出JSON格式：title(标题)、cover(封面文案)、script(口播脚本)、comment(评论区话术)。
-业务：${svc.name}，目标客户：${svc.target}`;
+6. 只能输出JSON，不要任何解释、不要markdown代码块。格式：[{"title":"标题","cover":"封面文案","script":"口播脚本","comment":"评论区话术"}]。`;
   const userPrompt = `请为【${svc.name}】业务生成${count}条${style}风格的巨量本地推爆款文案。
 补充需求：${demand || '无'}
 要求：每条风格不同，标题有吸引力，脚本开头3秒抓眼球，结构为痛点-方案-证明-行动号召，结尾引导评论或私信。
-请以JSON数组格式输出，每条包含title、cover、script、comment字段。`;
+只输出JSON数组，不要任何其他文字。`;
 
   try {
     const resp = await fetch(baseURL + '/chat/completions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
-      body: JSON.stringify({
-        model,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
-        ],
-        temperature: 0.85
-      })
+      body: JSON.stringify({ model, messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }], temperature: 0.85 })
     });
     const data = await resp.json();
     if (data.choices && data.choices[0]) {
-      let content = data.choices[0].message.content;
-      // 尝试解析JSON
-      const jsonMatch = content.match(/$$[\s\S]*$$/);
-      if (jsonMatch) {
-        try {
-          const arr = JSON.parse(jsonMatch[0]);
-          return arr.map(item => {
-            const full = (item.title||'')+(item.cover||'')+(item.script||'')+(item.comment||'');
-            return {
-              style: 'AI生成',
-              styleKey: 'ai',
-              title: ComplianceEngine.sanitize(item.title || ''),
-              cover: ComplianceEngine.sanitize(item.cover || ''),
-              script: ComplianceEngine.sanitize(item.script || ''),
-              comment: ComplianceEngine.sanitize(item.comment || ''),
-              compliance: ComplianceEngine.score(full)
-            };
-          });
-        } catch(e) {}
+      let content = data.choices[0].message.content || '';
+      content = content.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+      let parsed = null;
+      try { parsed = JSON.parse(content); } catch(e) {
+        const arrMatch = content.match(/$$[\s\S]*$$/);
+        if (arrMatch) { try { parsed = JSON.parse(arrMatch[0]); } catch(e2) {} }
       }
-      // 单条返回
-      const objMatch = content.match(/\{[\s\S]*\}/);
-      if (objMatch) {
-        try {
-          const item = JSON.parse(objMatch[0]);
+      let items = [];
+      if (Array.isArray(parsed)) items = parsed;
+      else if (parsed && typeof parsed === 'object') items = [parsed];
+      if (items.length > 0) {
+        return items.map(item => {
           const full = (item.title||'')+(item.cover||'')+(item.script||'')+(item.comment||'');
-          return [{
-            style: 'AI生成', styleKey: 'ai',
-            title: ComplianceEngine.sanitize(item.title||''),
-            cover: ComplianceEngine.sanitize(item.cover||''),
-            script: ComplianceEngine.sanitize(item.script||''),
-            comment: ComplianceEngine.sanitize(item.comment||''),
-            compliance: ComplianceEngine.score(full)
-          }];
-        } catch(e) {}
+          return { style: 'AI生成', styleKey: 'ai', title: ComplianceEngine.sanitize(item.title || ''), cover: ComplianceEngine.sanitize(item.cover || ''), script: ComplianceEngine.sanitize(item.script || ''), comment: ComplianceEngine.sanitize(item.comment || ''), compliance: ComplianceEngine.score(full) };
+        });
       }
-      showToast('AI 返回格式解析失败，请重试');
-      return null;
+      const resultCard = document.getElementById('resultCard');
+      const resultContent = document.getElementById('resultContent');
+      const countTag = document.getElementById('resultCountTag');
+      resultCard.style.display = 'block';
+      countTag.textContent = '解析失败';
+      resultContent.innerHTML = `
+        <div style="background:#FFF2F0;border:1px solid #FFCCC7;border-radius:12px;padding:16px;margin-bottom:12px;">
+          <div style="font-weight:600;color:#FF4D4F;margin-bottom:8px;">⚠️ AI 返回内容解析失败</div>
+          <div style="font-size:13px;color:#666;margin-bottom:8px;">以下是 AI 的原始返回，可截图反馈排查：</div>
+          <pre style="background:#f5f5f5;padding:12px;border-radius:8px;white-space:pre-wrap;word-break:break-all;font-size:12px;max-height:300px;overflow:auto;">${escapeHtml(content)}</pre>
+        </div>`;
+      showToast('AI 返回格式解析失败，已展示原始内容');
+      return 'raw';
     }
     showToast('AI 生成失败：' + (data.error?.message || '未知错误'));
     return null;
@@ -691,7 +612,6 @@ let currentService = 'dailizhang';
 let currentStyle = 'random';
 let currentCount = 1;
 
-// 业务选择
 document.querySelectorAll('#serviceTags .tag').forEach(tag => {
   tag.addEventListener('click', () => {
     document.querySelectorAll('#serviceTags .tag').forEach(t => t.classList.remove('active'));
@@ -699,8 +619,6 @@ document.querySelectorAll('#serviceTags .tag').forEach(tag => {
     currentService = tag.dataset.value;
   });
 });
-
-// 风格选择
 document.querySelectorAll('#styleTags .style-tag').forEach(tag => {
   tag.addEventListener('click', () => {
     document.querySelectorAll('#styleTags .style-tag').forEach(t => t.classList.remove('active'));
@@ -708,8 +626,6 @@ document.querySelectorAll('#styleTags .style-tag').forEach(tag => {
     currentStyle = tag.dataset.value;
   });
 });
-
-// 生成数量
 document.querySelectorAll('#countOptions .count-opt').forEach(opt => {
   opt.addEventListener('click', () => {
     document.querySelectorAll('#countOptions .count-opt').forEach(o => o.classList.remove('active'));
@@ -717,8 +633,6 @@ document.querySelectorAll('#countOptions .count-opt').forEach(opt => {
     currentCount = parseInt(opt.dataset.count);
   });
 });
-
-// 设置面板
 document.getElementById('settingsToggle').addEventListener('click', () => {
   const panel = document.getElementById('settingsPanel');
   const arrow = document.getElementById('settingsArrow');
@@ -726,7 +640,6 @@ document.getElementById('settingsToggle').addEventListener('click', () => {
   arrow.textContent = panel.classList.contains('open') ? '▲' : '▼';
 });
 
-// 加载设置
 function loadSettings() {
   try {
     const s = JSON.parse(localStorage.getItem('csSettings') || '{}');
@@ -751,7 +664,6 @@ document.getElementById('saveSettingsBtn').addEventListener('click', () => {
   showToast('设置已保存');
 });
 
-// 测试 API
 document.getElementById('testApiBtn').addEventListener('click', async () => {
   const apiKey = document.getElementById('apiKey').value.trim();
   const baseURL = document.getElementById('baseURL').value.trim() || 'https://ark.cn-beijing.volces.com/api/v3';
@@ -770,7 +682,6 @@ document.getElementById('testApiBtn').addEventListener('click', async () => {
   } catch(e) { status.className = 'api-status error'; status.textContent = '❌ 网络错误：' + e.message; }
 });
 
-// 渲染结果
 function renderResults(results) {
   const card = document.getElementById('resultCard');
   const content = document.getElementById('resultContent');
@@ -784,44 +695,19 @@ function renderResults(results) {
     const levelText = { high: '合规', mid: '基本合规', low: '需修改' }[levelClass];
     div.innerHTML = `
       <div class="multi-result-head">
-        <div>
-          <span class="idx">文案 ${idx + 1}</span>
-          <span class="style-label"> · ${r.style}风格</span>
-        </div>
-        <div class="compliance-score score-${levelClass}">
-          <span class="score-dot ${levelClass}"></span>
-          <span>${r.compliance.score}分 · ${levelText}</span>
-        </div>
+        <div><span class="idx">文案 ${idx + 1}</span><span class="style-label"> · ${r.style}风格</span></div>
+        <div class="compliance-score score-${levelClass}"><span class="score-dot ${levelClass}"></span><span>${r.compliance.score}分 · ${levelText}</span></div>
       </div>
       <div class="multi-result-body">
-        <div class="block">
-          <div class="block-label">📌 标题</div>
-          <div class="copy-item"><div class="copy-text">${escapeHtml(r.title)}</div><span class="copy-btn" data-copy="${idx}-title">复制</span></div>
-        </div>
-        <div class="block">
-          <div class="block-label">🖼️ 封面文案</div>
-          <div class="copy-item"><div class="copy-text">${escapeHtml(r.cover)}</div><span class="copy-btn" data-copy="${idx}-cover">复制</span></div>
-        </div>
-        <div class="block">
-          <div class="block-label">🎤 口播脚本</div>
-          <div class="script-block">
-            <span class="copy-btn" data-copy="${idx}-script">复制脚本</span>
-            ${escapeHtml(r.script)}
-          </div>
-        </div>
-        <div class="block">
-          <div class="block-label">💬 评论区话术</div>
-          <div class="copy-item"><div class="copy-text">${escapeHtml(r.comment)}</div><span class="copy-btn" data-copy="${idx}-comment">复制</span></div>
-        </div>
+        <div class="block"><div class="block-label">📌 标题</div><div class="copy-item"><div class="copy-text">${escapeHtml(r.title)}</div><span class="copy-btn" data-copy="${idx}-title">复制</span></div></div>
+        <div class="block"><div class="block-label">🖼️ 封面文案</div><div class="copy-item"><div class="copy-text">${escapeHtml(r.cover)}</div><span class="copy-btn" data-copy="${idx}-cover">复制</span></div></div>
+        <div class="block"><div class="block-label">🎤 口播脚本</div><div class="script-block"><span class="copy-btn" data-copy="${idx}-script">复制脚本</span>${escapeHtml(r.script)}</div></div>
+        <div class="block"><div class="block-label">💬 评论区话术</div><div class="copy-item"><div class="copy-text">${escapeHtml(r.comment)}</div><span class="copy-btn" data-copy="${idx}-comment">复制</span></div></div>
         ${r.compliance.issues.length ? `<div class="compliance-tip"><strong>⚠️ 合规提示：</strong>检测到 ${r.compliance.issues.length} 处需注意：${r.compliance.issues.map(i=>i.word+'('+i.type+')').join('、')}</div>` : ''}
-        <div style="margin-top:12px;display:flex;gap:8px;">
-          <button class="btn-secondary" data-copy="${idx}-all" style="margin-top:0;flex:1;">📋 复制全部</button>
-        </div>
-      </div>
-    `;
+        <div style="margin-top:12px;display:flex;gap:8px;"><button class="btn-secondary" data-copy="${idx}-all" style="margin-top:0;flex:1;">📋 复制全部</button></div>
+      </div>`;
     content.appendChild(div);
   });
-  // 绑定复制
   content.querySelectorAll('.copy-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const key = btn.dataset.copy;
@@ -837,16 +723,10 @@ function renderResults(results) {
   card.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function escapeHtml(str) {
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
-}
-
+function escapeHtml(str) { const div = document.createElement('div'); div.textContent = str; return div.innerHTML; }
 function copyText(text) {
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(text).then(() => showToast('已复制到剪贴板')).catch(() => fallbackCopy(text));
-  } else fallbackCopy(text);
+  if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => showToast('已复制到剪贴板')).catch(() => fallbackCopy(text));
+  else fallbackCopy(text);
 }
 function fallbackCopy(text) {
   const ta = document.createElement('textarea');
@@ -855,21 +735,18 @@ function fallbackCopy(text) {
   try { document.execCommand('copy'); showToast('已复制到剪贴板'); } catch(e) { showToast('复制失败'); }
   document.body.removeChild(ta);
 }
-
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 1800);
 }
 
-// 生成本地文案
 document.getElementById('generateBtn').addEventListener('click', () => {
   const demand = document.getElementById('demandInput').value;
   const results = generateBatch(currentService, currentStyle, currentCount, demand);
   renderResults(results);
 });
 
-// AI 生成
 document.getElementById('aiBtn').addEventListener('click', async () => {
   const btn = document.getElementById('aiBtn');
   const demand = document.getElementById('demandInput').value;
@@ -878,10 +755,9 @@ document.getElementById('aiBtn').addEventListener('click', async () => {
   const results = await generateAI(currentService, currentStyle, currentCount, demand);
   btn.disabled = false;
   btn.innerHTML = '✨ AI 深度生成（需 API 密钥·创意更强）';
-  if (results) renderResults(results);
+  if (results && results !== 'raw') renderResults(results);
 });
 
-// 飞书同步
 document.getElementById('syncFeishuBtn').addEventListener('click', async () => {
   const appId = document.getElementById('feishuAppId').value.trim();
   const appSecret = document.getElementById('feishuAppSecret').value.trim();
@@ -894,7 +770,6 @@ let recognition = null;
 let isRecording = false;
 let recordTimer = null;
 let recordSeconds = 0;
-
 const voiceBtn = document.getElementById('voiceBtn');
 const voiceBtnText = document.getElementById('voiceBtnText');
 const voiceStatus = document.getElementById('voiceStatus');
@@ -965,7 +840,6 @@ function stopRecord() {
 
 voiceBtn.addEventListener('click', () => { isRecording ? stopRecord() : startRecord(); });
 recordingOverlay.addEventListener('click', stopRecord);
-
 initVoice();
 </script>
 </body>
